@@ -1,0 +1,4 @@
+obj/
+bin/
+.ionid
+webapp_dist/
