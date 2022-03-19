@@ -1,6 +1,7 @@
 using System.Text;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore.SqlServer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.IdentityModel.Tokens;
@@ -14,8 +15,9 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 // builder.Services.Configure<JWTSettings>(builder.Configuration.GetSection("JWTConfig"));
+string connectionString = builder.Configuration.GetConnectionString("SqlServerTMonit");
 builder.Services.AddDbContext<DatabaseContext>(
-    // options=>options.UseSqlite("data/data.db")
+    options => options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString))
 );
 builder.Services.AddAuthentication(options =>
 {
