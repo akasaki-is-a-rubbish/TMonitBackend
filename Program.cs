@@ -4,7 +4,6 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.IdentityModel.Tokens;
-using TMonitBackend.Data;
 using TMonitBackend.Models;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -15,7 +14,9 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 // builder.Services.Configure<JWTSettings>(builder.Configuration.GetSection("JWTConfig"));
-builder.Services.AddDbContext<DatabaseContext>();
+builder.Services.AddDbContext<DatabaseContext>(
+    // options=>options.UseSqlite("data/data.db")
+);
 builder.Services.AddAuthentication(options =>
 {
     options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -48,27 +49,22 @@ using (var scope = app.Services.CreateScope())
     await dbctx.Database.MigrateAsync();
 }
 
-// Configure the HTTP request pipeline.
+// Configure the HTTP request pipeline on dev.
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Home/Error");
     // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
     app.UseHsts();
+    app.UseCors();
+    app.UseSwagger();
+    app.UseSwaggerUI();
+    app.UseAuthentication();
 }
 
 app.UseHttpsRedirection();
 app.UseStaticFiles();
 
 app.UseRouting();
-
-// Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
-{
-    app.UseCors();
-    app.UseSwagger();
-    app.UseSwaggerUI();
-    app.UseAuthentication();
-}
 
 app.UseAuthorization();
 
