@@ -47,19 +47,19 @@ using (var scope = app.Services.CreateScope())
 }
 
 // Configure the HTTP request pipeline on dev.
-if (!app.Environment.IsDevelopment())
+if (app.Environment.IsDevelopment())
 {
-    app.UseExceptionHandler("/Home/Error");
-    app.UseHsts();
     app.UseCors();
     app.UseSwagger();
     app.UseSwaggerUI();
     app.UseAuthentication();
 }
 
+app.UseExceptionHandler("/Home/Error");
+app.UseHsts();
+
 app.UseHttpsRedirection();
 app.UseStaticFiles();
 app.UseRouting();
-app.UseAuthorization();
 app.MapControllers();
-app.Run("http://0.0.0.0:10017");
+app.Run("http://localhost:10017");

@@ -27,7 +27,7 @@ namespace TMonitBackend.Controllers
         }
 
         [HttpPost]
-        [Route("Register")]
+        [Route("register")]
         public async Task<IActionResult> Register([FromBody] UserRegistration user)
         {
             // 检查传入请求是否有效
@@ -117,7 +117,7 @@ namespace TMonitBackend.Controllers
         }
 
         [HttpPost]
-        [Route("Login")]
+        [Route("login")]
         public async Task<IActionResult> Login([FromBody] UserLoginRequest user)
         {
             if (ModelState.IsValid)
