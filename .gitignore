@@ -3,3 +3,4 @@ bin/
 .ionid
 webapp_dist/
 appsettings.json
+appsettings.production.json
