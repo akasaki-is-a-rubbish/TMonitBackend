@@ -4,3 +4,4 @@ bin/
 webapp_dist/
 appsettings.json
 appsettings.production.json
+Migrations/

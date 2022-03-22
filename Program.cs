@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using TMonitBackend.Models;
 using TMonitBackend.Configuration;
+using TMonitBackend.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllers();
@@ -34,7 +35,8 @@ builder.Services.AddAuthentication(options =>
         RequireExpirationTime = false
     };
 });
-
+builder.Services.AddSingleton<EmailService>();
+builder.Services.AddSingleton<ValidationQuery>();
 builder.Services.AddDefaultIdentity<User>(options => options.SignIn.RequireConfirmedAccount = true)
             .AddEntityFrameworkStores<DatabaseContext>();
 

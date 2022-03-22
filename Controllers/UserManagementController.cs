@@ -26,8 +26,7 @@ namespace TMonitBackend.Controllers
             _jwtConfig = jWTSettings.CurrentValue;
         }
 
-        [HttpPost]
-        [Route("register")]
+        [HttpPost("register")]
         public async Task<IActionResult> Register([FromBody] UserRegistration user)
         {
             // 检查传入请求是否有效
