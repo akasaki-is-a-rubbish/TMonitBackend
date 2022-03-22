@@ -5,7 +5,7 @@ using TMonitBackend.Models;
 namespace TMonitBackend.Services
 {
 
-    class EmailService : IMessage
+    public class EmailService : IMessage
     {
         SmtpClient client;
         public EmailService(string host, int port, string fromAddr, string displayName) :
