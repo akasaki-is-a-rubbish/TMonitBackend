@@ -11,7 +11,7 @@ using Microsoft.IdentityModel.Tokens;
 
 namespace TMonitBackend.Controllers
 {
-    [Route("api/")]
+    [Route("api/user/")]
     [ApiController]
     public class UserManagementController : ControllerBase
     {

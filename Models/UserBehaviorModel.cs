@@ -10,6 +10,8 @@ namespace TMonitBackend.Models
         public DateTime dateTime { get; set; }
         public string? imageId { get; set; }
         public UserBehaviorImage? image { get; set; }
+        public string description { get; set; } = "abnormal behavior";
+        public uint dangerousLevel { get; set; } = 0;
     }
     public class UserBehaviorImage
     {

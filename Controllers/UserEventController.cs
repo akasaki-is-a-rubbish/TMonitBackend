@@ -12,14 +12,48 @@ using Microsoft.IdentityModel.Tokens;
 namespace TMonitBackend.Controllers
 {
 
-    [Route("api/")]
+    [Route("api/events/")]
     [ApiController]
     public class UserEventController : ControllerBase
     {
         //todo
-        [HttpGet("events/")]
-        public async Task<IActionResult> GetEvents([FromQuery] int year, [FromQuery] int month, [FromQuery] int day)
+        [HttpGet()]
+        public async Task<IActionResult> GetEvents([FromBody] int startFromIndex = 0)
         {
+            return Ok(new
+            {
+                Success = true,
+                // Events = new List<UserEvent>()
+                //todo
+            });
+        }
+
+        [HttpPost("new")]
+        public async Task<IActionResult> NewEvent([FromBody] UserBehaviorRec newEvent)
+        {
+            //todo
+            return Ok(new
+            {
+                Success = true,
+                // Event = newEvent
+            });
+        }
+
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> DeleteEvent(string id)
+        {
+            //todo
+            return Ok(new
+            {
+                Success = true,
+                // Event = newEvent
+            });
+        }
+
+        [HttpPost("emergency/")]
+        public async Task<IActionResult> Emergency([FromBody] string emergencyEvent)
+        {
+            //todo
             return Ok(new
             {
                 Success = true,
