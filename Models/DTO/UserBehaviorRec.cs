@@ -1,8 +1,11 @@
 namespace TMonitBackend.Models.DTO{
     public class UserBehaviorRec{
+        public string? id;
         public long? userId { get; set; }
         public long vehicleId { get; set; }
         public string description { get; set; } = "dangerous behavior";
-        DateTime dateTime { get; set; } = DateTime.Now;
+        public DateTime dateTime { get; set; } = DateTime.Now;
+        public string? image { get; set; }
+        public uint dangerousLevel { get; set; } = 0;
     }
 }

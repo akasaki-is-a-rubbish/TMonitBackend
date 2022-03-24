@@ -8,20 +8,23 @@ namespace dotnet_ts.Controllers
     [ApiController]
     public class ImageController : Controller
     {
+        DatabaseContext _dbctx;
+        public ImageController(DatabaseContext dbctx)=>this._dbctx = dbctx;
+
         [HttpGet("{id}")]
-        public async Task<IActionResult> GetImageById([FromRoute] string id, [FromServices] DatabaseContext dbctx)
+        public async Task<IActionResult> GetImageById([FromRoute] string id)
         {
-            var image = await dbctx.Images.Where(x => x.id == id).SingleOrDefaultAsync();
+            var image = await _dbctx.Images.Where(x => x.id == id).SingleOrDefaultAsync();
             if (image == null) return NotFound();
             return new FileStreamResult(new MemoryStream(image.data, false), "image/jpeg");
         }
-        
+
         [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteImageById([FromRoute] string id, [FromServices] DatabaseContext dbctx)
+        public async Task<IActionResult> DeleteImageById([FromRoute] string id)
         {
-            var image = await dbctx.Images.Where(x => x.id == id).SingleOrDefaultAsync();
+            var image = await _dbctx.Images.Where(x => x.id == id).SingleOrDefaultAsync();
             if (image == null) return NotFound();
-            dbctx.Images.Remove(image);
+            _dbctx.Images.Remove(image);
             return NoContent();
         }
     }
