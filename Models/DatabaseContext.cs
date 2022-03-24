@@ -9,13 +9,13 @@ namespace TMonitBackend.Models
 {
     public class DatabaseContext : IdentityDbContext<User, IdentityRole<long>, long>
     {
-        // already done in startup(Program.cs).
-        // protected override void OnConfiguring(DbContextOptionsBuilder options)
-        //             => options.UseMySql("Server=cloud.akasaki.space;Port=3306;Database=tmonitbackend;Uid=akasaki;Pwd=pwd;connect timeout=100;default command timeout=200;",
-        //             ServerVersion.AutoDetect("Server=cloud.akasaki.space;Port=3306;Database=tmonitbackend;Uid=akasaki;Pwd=pwd;connect timeout=100;default command timeout=200;"));
+        public DbSet<Vehicle> Vehicles { get; set; }
+        public DbSet<UserBehavior> UserBehaviors { get; set; }
+        public DbSet<CommonImage> Images {get; set;}
 
-        public DatabaseContext(DbContextOptions options):base(options){
-
+        public DatabaseContext(DbContextOptions options) : base(options)
+        {
+            
         }
 
         protected override void OnModelCreating(ModelBuilder builder)

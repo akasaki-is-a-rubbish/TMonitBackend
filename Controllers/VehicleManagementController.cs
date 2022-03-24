@@ -11,9 +11,11 @@ namespace TMonitBackend.Models{
     [Route("api/vehicles/")]
     [ApiController]
     public class VehicleManagementController : ControllerBase{
+        
         [HttpPost("pair")]
-        public async Task<IActionResult> PendPairVehicle([FromQuery] long id){
-            //todo
+        public async Task<IActionResult> PendPairVehicle([FromBody] long id){
+            // check if in query 
+
             return Ok(new
             {
                 Success = true,
@@ -21,7 +23,7 @@ namespace TMonitBackend.Models{
             });
         }
         [HttpGet("info")]
-        public async Task<IActionResult> VehicleInformation([FromQuery] long id){
+        public async Task<IActionResult> VehicleInformation([FromBody] long id){
             //todo
             return Ok(new
             {

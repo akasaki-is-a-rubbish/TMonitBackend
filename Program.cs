@@ -35,7 +35,8 @@ builder.Services.AddAuthentication(options =>
         RequireExpirationTime = false
     };
 });
-builder.Services.AddSingleton<EmailService>();
+//todo
+// builder.Services.AddSingleton<EmailService>();
 builder.Services.AddSingleton<ValidationQuery>();
 builder.Services.AddDefaultIdentity<User>(options => options.SignIn.RequireConfirmedAccount = true)
             .AddEntityFrameworkStores<DatabaseContext>();

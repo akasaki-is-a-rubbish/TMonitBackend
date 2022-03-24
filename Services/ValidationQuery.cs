@@ -4,13 +4,17 @@ namespace TMonitBackend.Services
 {
     public class ValidationQuery
     {
+        public ValidationQuery(){}
         private static Dictionary<object, Task<bool>> _validationTasks = new Dictionary<object, Task<bool>>();
+        private static Dictionary<object, bool> _validationRegistries = new Dictionary<object, bool>(); 
+        
         public string add(Task<bool> whatnext)
         {
             var guid = new Guid();
             _validationTasks.Add(guid, whatnext);
             return guid.ToString();
         }
+
         public bool validate(string guid)
         {
             if (_validationTasks.ContainsKey(guid))

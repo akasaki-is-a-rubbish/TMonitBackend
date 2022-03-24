@@ -93,10 +93,12 @@ namespace TMonitBackend.Migrations
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<long>", b =>
                 {
                     b.Property<string>("LoginProvider")
-                        .HasColumnType("varchar(255)");
+                        .HasMaxLength(128)
+                        .HasColumnType("varchar(128)");
 
                     b.Property<string>("ProviderKey")
-                        .HasColumnType("varchar(255)");
+                        .HasMaxLength(128)
+                        .HasColumnType("varchar(128)");
 
                     b.Property<string>("ProviderDisplayName")
                         .HasColumnType("longtext");
@@ -132,10 +134,12 @@ namespace TMonitBackend.Migrations
                         .HasColumnType("bigint");
 
                     b.Property<string>("LoginProvider")
-                        .HasColumnType("varchar(255)");
+                        .HasMaxLength(128)
+                        .HasColumnType("varchar(128)");
 
                     b.Property<string>("Name")
-                        .HasColumnType("varchar(255)");
+                        .HasMaxLength(128)
+                        .HasColumnType("varchar(128)");
 
                     b.Property<string>("Value")
                         .HasColumnType("longtext");
@@ -143,6 +147,20 @@ namespace TMonitBackend.Migrations
                     b.HasKey("UserId", "LoginProvider", "Name");
 
                     b.ToTable("AspNetUserTokens", (string)null);
+                });
+
+            modelBuilder.Entity("TMonitBackend.Models.CommonImage", b =>
+                {
+                    b.Property<string>("id")
+                        .HasColumnType("varchar(255)");
+
+                    b.Property<byte[]>("data")
+                        .IsRequired()
+                        .HasColumnType("longblob");
+
+                    b.HasKey("id");
+
+                    b.ToTable("CommonImage");
                 });
 
             modelBuilder.Entity("TMonitBackend.Models.User", b =>
@@ -198,6 +216,9 @@ namespace TMonitBackend.Migrations
                         .HasMaxLength(256)
                         .HasColumnType("varchar(256)");
 
+                    b.Property<string>("imageId")
+                        .HasColumnType("varchar(255)");
+
                     b.HasKey("Id");
 
                     b.HasIndex("NormalizedEmail")
@@ -207,7 +228,55 @@ namespace TMonitBackend.Migrations
                         .IsUnique()
                         .HasDatabaseName("UserNameIndex");
 
+                    b.HasIndex("imageId");
+
                     b.ToTable("AspNetUsers", (string)null);
+                });
+
+            modelBuilder.Entity("TMonitBackend.Models.UserBehavior", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("varchar(255)");
+
+                    b.Property<uint>("dangerousLevel")
+                        .HasColumnType("int unsigned");
+
+                    b.Property<DateTime>("dateTime")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<string>("description")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("imageId")
+                        .HasColumnType("varchar(255)");
+
+                    b.Property<long>("userId")
+                        .HasColumnType("bigint");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("imageId");
+
+                    b.HasIndex("userId");
+
+                    b.ToTable("UserBehaviors");
+                });
+
+            modelBuilder.Entity("TMonitBackend.Models.Vehicle", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    b.Property<long?>("userId")
+                        .HasColumnType("bigint");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("userId");
+
+                    b.ToTable("Vehicles");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<long>", b =>
@@ -259,6 +328,48 @@ namespace TMonitBackend.Migrations
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+                });
+
+            modelBuilder.Entity("TMonitBackend.Models.User", b =>
+                {
+                    b.HasOne("TMonitBackend.Models.CommonImage", "image")
+                        .WithMany()
+                        .HasForeignKey("imageId");
+
+                    b.Navigation("image");
+                });
+
+            modelBuilder.Entity("TMonitBackend.Models.UserBehavior", b =>
+                {
+                    b.HasOne("TMonitBackend.Models.CommonImage", "image")
+                        .WithMany()
+                        .HasForeignKey("imageId");
+
+                    b.HasOne("TMonitBackend.Models.User", "user")
+                        .WithMany("bhRecs")
+                        .HasForeignKey("userId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("image");
+
+                    b.Navigation("user");
+                });
+
+            modelBuilder.Entity("TMonitBackend.Models.Vehicle", b =>
+                {
+                    b.HasOne("TMonitBackend.Models.User", "user")
+                        .WithMany("vehicles")
+                        .HasForeignKey("userId");
+
+                    b.Navigation("user");
+                });
+
+            modelBuilder.Entity("TMonitBackend.Models.User", b =>
+                {
+                    b.Navigation("bhRecs");
+
+                    b.Navigation("vehicles");
                 });
 #pragma warning restore 612, 618
         }

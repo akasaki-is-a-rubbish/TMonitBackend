@@ -1,0 +1,17 @@
+{
+    "sqltools.connections": [
+        {
+            "mysqlOptions": {
+                "authProtocol": "default"
+            },
+            "previewLimit": 50,
+            "server": "cloud.akasaki.space",
+            "port": 3306,
+            "driver": "MariaDB",
+            "name": "TMonitBackend",
+            "database": "tmonitbackend",
+            "username": "akasaki",
+            "password": "bassword"
+        }
+    ]
+}
