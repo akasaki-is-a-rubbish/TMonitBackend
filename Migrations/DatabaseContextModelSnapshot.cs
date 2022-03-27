@@ -254,11 +254,16 @@ namespace TMonitBackend.Migrations
                     b.Property<long>("userId")
                         .HasColumnType("bigint");
 
+                    b.Property<string>("vehicleId")
+                        .HasColumnType("varchar(255)");
+
                     b.HasKey("Id");
 
                     b.HasIndex("imageId");
 
                     b.HasIndex("userId");
+
+                    b.HasIndex("vehicleId");
 
                     b.ToTable("UserBehaviors");
                 });
@@ -283,9 +288,17 @@ namespace TMonitBackend.Migrations
                     b.Property<long?>("userId")
                         .HasColumnType("bigint");
 
+                    b.Property<string>("vehicleId")
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("vehicleId1")
+                        .HasColumnType("varchar(255)");
+
                     b.HasKey("Id");
 
                     b.HasIndex("userId");
+
+                    b.HasIndex("vehicleId1");
 
                     b.ToTable("Vehicles");
                 });
@@ -362,9 +375,15 @@ namespace TMonitBackend.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("TMonitBackend.Models.Vehicle", "vehicle")
+                        .WithMany()
+                        .HasForeignKey("vehicleId");
+
                     b.Navigation("image");
 
                     b.Navigation("user");
+
+                    b.Navigation("vehicle");
                 });
 
             modelBuilder.Entity("TMonitBackend.Models.Vehicle", b =>
@@ -373,7 +392,13 @@ namespace TMonitBackend.Migrations
                         .WithMany("vehicles")
                         .HasForeignKey("userId");
 
+                    b.HasOne("TMonitBackend.Models.Vehicle", "vehicle")
+                        .WithMany()
+                        .HasForeignKey("vehicleId1");
+
                     b.Navigation("user");
+
+                    b.Navigation("vehicle");
                 });
 
             modelBuilder.Entity("TMonitBackend.Models.User", b =>

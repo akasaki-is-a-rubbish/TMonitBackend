@@ -6,6 +6,8 @@ namespace TMonitBackend.Models
         public string Id { get; set; }
         public long userId { get; set; }
         public User? user { get; set; }
+        public string? vehicleId { get; set; }
+        public Vehicle? vehicle { get; set; }
         public DateTime dateTime { get; set; }
         public string? imageId { get; set; }
         public CommonImage? image { get; set; }

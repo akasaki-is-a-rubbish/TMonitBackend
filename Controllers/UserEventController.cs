@@ -31,6 +31,8 @@ namespace TMonitBackend.Controllers
                 {
                     id = x.Id,
                     description = x.description,
+                    vehicleId = x.vehicleId,
+                    dangerousLevel = x.dangerousLevel,
                     dateTime = x.dateTime,
                     image = x.imageId == null ? null : ("/api/images/" + x.imageId)
                 })
@@ -40,7 +42,7 @@ namespace TMonitBackend.Controllers
         [HttpPost("new")]
         public async Task<IActionResult> NewEvent([FromBody] UserBehaviorRec newEvent)
         {
-            var idDecrypted = InlineRSA.Decrypt(newEvent.vehicleIdEncrypted).Split('.')[0];
+            var idDecrypted = InlineRSA.Decrypt(newEvent.vehicleIdEncrypted).Split('|')[0];
             var vehicleExist = _dbctx.Vehicles.Where(x => x.Id == idDecrypted);
             if (vehicleExist == null) throw new Exception("Not a valid vehicle");
             var bindUserId = vehicleExist.Select(x => x.userId).FirstOrDefault();
@@ -50,6 +52,7 @@ namespace TMonitBackend.Controllers
             {
                 Id = eventId,
                 userId = bindUserId.Value,
+                vehicleId = idDecrypted,
                 dateTime = newEvent.dateTime == null ? DateTime.Now : newEvent.dateTime,
                 description = newEvent.description,
                 dangerousLevel = newEvent.dangerousLevel
