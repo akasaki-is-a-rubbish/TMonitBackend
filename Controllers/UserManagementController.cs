@@ -200,17 +200,28 @@ namespace TMonitBackend.Controllers
             });
         }
 
+        [HttpPost("{id}/setEmergencyContract")]
+        public async Task<IActionResult> SetEmergencyContract([FromRoute] long id,[FromBody] string emergencyContract){
+            var userid = long.Parse(User.FindFirstValue("Id") ?? throw new Exception("Not login"));
+            var user = _dbctx.Users.Where(x=>x.Id == id).FirstOrDefault();
+            user.EmergencyContract = emergencyContract;
+            await _dbctx.SaveChangesAsync();
+            return Ok();
+        }
+
         [HttpGet("currentUser")]
         public async Task<IActionResult> GetCurrentUser()
         {
             var userid = long.Parse(User.FindFirstValue("Id") ?? throw new Exception("Not login"));
-            var avatarUrl = User.FindFirstValue("imageId") == null ? "https://github.githubassets.com/images/modules/logos_page/Octocat.png" : "/api/images/" + User.FindFirstValue("imageId");
+            var user = _dbctx.Users.Where(x=>x.Id == userid).FirstOrDefault();
+            var avatarUrl = user.image == null ? "https://github.githubassets.com/images/modules/logos_page/Octocat.png" : "/api/images/" + User.FindFirstValue("imageId");
             return new JsonResult(new
             {
                 id = User.FindFirstValue("id"),
                 username = User.FindFirstValue(ClaimTypes.Name),
                 email = User.FindFirstValue(ClaimTypes.Email),
-                avatar = avatarUrl
+                avatar = avatarUrl,
+                emergencycontract = user.EmergencyContract
             });
         }
 

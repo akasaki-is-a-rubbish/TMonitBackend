@@ -6,5 +6,6 @@ namespace TMonitBackend.Models{
         public List<Vehicle>? vehicles { get; set; }
         public string? imageId { get; set; }
         public CommonImage? image { get; set; }
+        public string? EmergencyContract { get; set; }
     }
 }
