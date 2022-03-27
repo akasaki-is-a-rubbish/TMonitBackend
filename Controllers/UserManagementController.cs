@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.EntityFrameworkCore;
 
 namespace TMonitBackend.Controllers
 {
@@ -17,13 +18,16 @@ namespace TMonitBackend.Controllers
     {
         private readonly UserManager<User> _userManager;
         private readonly JWTSettings _jwtConfig;
+        private DatabaseContext _dbctx;
 
         public UserManagementController(
                 UserManager<User> userManager,
-                IOptionsMonitor<JWTSettings> jWTSettings)
+                IOptionsMonitor<JWTSettings> jWTSettings,
+                DatabaseContext dbctx)
         {
             _userManager = userManager;
             _jwtConfig = jWTSettings.CurrentValue;
+            _dbctx = dbctx;
         }
 
         [HttpPost("register")]
@@ -171,13 +175,56 @@ namespace TMonitBackend.Controllers
             });
         }
 
+        [HttpPut("{id}/updateAvatar")]
+        public async Task<IActionResult> UpdateUserAvatar([FromRoute] long id)
+        {
+            var userid = long.Parse(User.FindFirstValue("Id") ?? throw new Exception("Not login"));
+            var user = await _dbctx.Users.Where(x => x.Id == userid)
+                //todo
+                // .Include(x => x.image)
+                .FirstOrDefaultAsync();
+            byte[] data = await ReadRequestBodyAsBytes();
+            var image = new CommonImage()
+            {
+                id = Guid.NewGuid().ToString("D"),
+                data = data
+            };
+            if (user.imageId != null)
+                _dbctx.Images.Remove(new CommonImage() { id = user.imageId });
+            user.image = image;
+            await _dbctx.SaveChangesAsync();
+            return new JsonResult(new
+            {
+                success = true,
+                url = "/api/images/" + image.id
+            });
+        }
+
         [HttpGet("currentUser")]
-        public async Task<IActionResult> GetCurrentUser() {
-            return new JsonResult(new {
+        public async Task<IActionResult> GetCurrentUser()
+        {
+            var userid = long.Parse(User.FindFirstValue("Id") ?? throw new Exception("Not login"));
+            var avatarUrl = User.FindFirstValue("imageId") == null ? "https://github.githubassets.com/images/modules/logos_page/Octocat.png" : "/api/images/" + User.FindFirstValue("imageId");
+            return new JsonResult(new
+            {
                 id = User.FindFirstValue("id"),
                 username = User.FindFirstValue(ClaimTypes.Name),
                 email = User.FindFirstValue(ClaimTypes.Email),
+                avatar = avatarUrl
             });
+        }
+
+        private async Task<byte[]> ReadRequestBodyAsBytes()
+        {
+            var fileStream = Request.Body;
+            byte[] data;
+            using (var ms = new MemoryStream())
+            {
+                await fileStream.CopyToAsync(ms);
+                data = ms.ToArray();
+            }
+
+            return data;
         }
     }
 }

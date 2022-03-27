@@ -43,11 +43,11 @@ builder.Services.AddDefaultIdentity<User>(options => options.SignIn.RequireConfi
 
 var app = builder.Build();
 
-using (var scope = app.Services.CreateScope())
-{
-    var dbctx = scope.ServiceProvider.GetService<DatabaseContext>();
-    await dbctx.Database.MigrateAsync();
-}
+// using (var scope = app.Services.CreateScope())
+// {
+//     var dbctx = scope.ServiceProvider.GetService<DatabaseContext>();
+//     await dbctx.Database.MigrateAsync();
+// }
 
 // Configure the HTTP request pipeline on dev.
 if (app.Environment.IsDevelopment())

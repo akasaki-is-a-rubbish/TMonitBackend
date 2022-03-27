@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.EntityFrameworkCore;
+using TMonitBackend.Services;
 
 namespace TMonitBackend.Controllers
 {
@@ -24,9 +25,9 @@ namespace TMonitBackend.Controllers
         public async Task<IActionResult> ListEvents(/* [FromBody] int startFromIndex = 0 */)//todo
         {
             var userId = long.Parse(this.User.FindFirstValue("Id") ?? throw new Exception("Not login"));
-            var todos = _dbctx.UserBehaviors.Where(x => x.userId == userId);
+            var behaviorRecs = _dbctx.UserBehaviors.Where(x => x.userId == userId);
             return new JsonResult(
-                todos.Select(x => new UserBehaviorRec
+                behaviorRecs.Select(x => new UserBehaviorRec
                 {
                     id = x.Id,
                     description = x.description,
@@ -39,16 +40,25 @@ namespace TMonitBackend.Controllers
         [HttpPost("new")]
         public async Task<IActionResult> NewEvent([FromBody] UserBehaviorRec newEvent)
         {
-            var userId = long.Parse(User.FindFirstValue("Id") ?? throw new Exception("Not login"));
+            var idDecrypted = InlineRSA.Decrypt(newEvent.vehicleIdEncrypted).Split('.')[0];
+            var vehicleExist = _dbctx.Vehicles.Where(x => x.Id == idDecrypted);
+            if (vehicleExist == null) throw new Exception("Not a valid vehicle");
+            var bindUserId = vehicleExist.Select(x => x.userId).FirstOrDefault();
+            if (bindUserId == null) throw new Exception("No user bind on this vehicle");
+            var eventId = Guid.NewGuid().ToString();
             _dbctx.UserBehaviors.Add(new UserBehavior
             {
-                userId = userId,
-                dateTime = newEvent.dateTime==null?DateTime.Now:newEvent.dateTime,
+                Id = eventId,
+                userId = bindUserId.Value,
+                dateTime = newEvent.dateTime == null ? DateTime.Now : newEvent.dateTime,
                 description = newEvent.description,
                 dangerousLevel = newEvent.dangerousLevel
             });
             await _dbctx.SaveChangesAsync();
-            return Ok();
+            return Ok(new
+            {
+                id = eventId
+            });
         }
 
         [HttpDelete("{id}")]
@@ -60,15 +70,18 @@ namespace TMonitBackend.Controllers
             _dbctx.UserBehaviors.Remove(behaviorRec);
             if (behaviorRec.imageId != null)
             {
-                _dbctx.Attach(new CommonImage() {id = behaviorRec.imageId}).State = EntityState.Deleted;
+                _dbctx.Attach(new CommonImage() { id = behaviorRec.imageId }).State = EntityState.Deleted;
             }
             await _dbctx.SaveChangesAsync();
             return Ok();
         }
 
         [HttpPut("{id}/image")]
-        public async Task<IActionResult> PutTodoImage([FromRoute] string id)
+        public async Task<IActionResult> PutEventImage([FromRoute] string id,[FromBody] string encryptedVehicleId)
         {
+            var idDecrypted = InlineRSA.Decrypt(encryptedVehicleId);
+            var vehicleExist = _dbctx.Vehicles.Where(x => x.Id == idDecrypted);
+            if (vehicleExist == null) throw new Exception("Not a valid vehicle");
             var behaviorRec = await _dbctx.UserBehaviors
                 .Where(x => x.Id == id)
                 //todo
@@ -76,32 +89,33 @@ namespace TMonitBackend.Controllers
                 .FirstOrDefaultAsync();
             if (behaviorRec == null) return NotFound();
             byte[] data = await ReadRequestBodyAsBytes();
-            var image = new CommonImage()  
+            var image = new CommonImage()
             {
                 id = Guid.NewGuid().ToString("D"),
                 data = data
             };
             if (behaviorRec.imageId != null)
             {
-                _dbctx.Images.Remove(new CommonImage() {id = behaviorRec.imageId});
+                _dbctx.Images.Remove(new CommonImage() { id = behaviorRec.imageId });
                 // _dbctx.Images.Remove(todo.image);
             }
             behaviorRec.image = image;
             await _dbctx.SaveChangesAsync();
             return new JsonResult(new
             {
-                url = "/api/events/images/" + image.id
+                success = true,
+                url = "/api/images/" + image.id
             });
         }
 
         [HttpDelete("{id}/image")]
-        public async Task<IActionResult> DeleteTodoImage([FromRoute] string id)
+        public async Task<IActionResult> DeleteEventImage([FromRoute] string id)
         {
             var behaviorRec = await _dbctx.UserBehaviors.Where(x => x.Id == id).FirstOrDefaultAsync();
             if (behaviorRec == null) return NotFound();
             if (behaviorRec.imageId != null)
             {
-                _dbctx.Attach(new CommonImage() {id = behaviorRec.imageId}).State = EntityState.Deleted;
+                _dbctx.Attach(new CommonImage() { id = behaviorRec.imageId }).State = EntityState.Deleted;
             }
             behaviorRec.imageId = null;
             await _dbctx.SaveChangesAsync();

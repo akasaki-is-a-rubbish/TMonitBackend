@@ -160,7 +160,7 @@ namespace TMonitBackend.Migrations
 
                     b.HasKey("id");
 
-                    b.ToTable("CommonImage");
+                    b.ToTable("Images");
                 });
 
             modelBuilder.Entity("TMonitBackend.Models.User", b =>
@@ -265,9 +265,20 @@ namespace TMonitBackend.Migrations
 
             modelBuilder.Entity("TMonitBackend.Models.Vehicle", b =>
                 {
-                    b.Property<long>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint");
+                    b.Property<string>("Id")
+                        .HasColumnType("varchar(255)");
+
+                    b.Property<string>("brand")
+                        .HasColumnType("longtext");
+
+                    b.Property<uint>("mileage")
+                        .HasColumnType("int unsigned");
+
+                    b.Property<string>("model")
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("name")
+                        .HasColumnType("longtext");
 
                     b.Property<long?>("userId")
                         .HasColumnType("bigint");

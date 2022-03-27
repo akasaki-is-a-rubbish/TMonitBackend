@@ -1,8 +1,9 @@
-namespace TMonitBackend.Models.DTO{
-    public class UserBehaviorRec{
-        public string? id;
-        public long? userId { get; set; }
-        public long vehicleId { get; set; }
+namespace TMonitBackend.Models.DTO
+{
+    public class UserBehaviorRec
+    {
+        public string? id { get; set; }
+        public string vehicleIdEncrypted { get; set; }
         public string description { get; set; } = "dangerous behavior";
         public DateTime dateTime { get; set; } = DateTime.Now;
         public string? image { get; set; }
