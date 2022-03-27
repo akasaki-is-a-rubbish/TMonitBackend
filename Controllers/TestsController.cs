@@ -21,7 +21,7 @@ namespace TMonitBackend.Controllers
         [HttpPost("rsa/encrypt")]
         public async Task<IActionResult> Encrypt([FromBody] string data)
         {
-            var encrypted = InlineRSA.Encrypt(data);
+            var encrypted = InlineCrypto.RSAEncrypt(data);
             return Ok(new
             {
                 success = true,
@@ -32,7 +32,7 @@ namespace TMonitBackend.Controllers
         [HttpPost("rsa/decrypt")]
         public async Task<IActionResult> Decrypt([FromBody] string data)
         {
-            var decrypted = InlineRSA.Decrypt(data);
+            var decrypted = InlineCrypto.RSADecrypt(data);
             return Ok(new
             {
                 success = true,
@@ -41,7 +41,7 @@ namespace TMonitBackend.Controllers
         }
         
         [HttpPost("vehicle/register")]
-        public async Task<IActionResult> RegisterNewVehicle([FromBody] long forWhichUserId)
+        public async Task<IActionResult> RegisterNewVehicle([FromBody] long? forWhichUserId)
         {
             var newVehicleId = Guid.NewGuid().ToString();
             _dbctx.Vehicles.Add(new Vehicle

@@ -42,7 +42,7 @@ namespace TMonitBackend.Controllers
         [HttpPost("new")]
         public async Task<IActionResult> NewEvent([FromBody] UserBehaviorRec newEvent)
         {
-            var idDecrypted = InlineRSA.Decrypt(newEvent.vehicleIdEncrypted).Split('|')[0];
+            var idDecrypted = InlineCrypto.RSADecrypt(newEvent.vehicleIdEncrypted).Split('|')[0];
             var vehicleExist = _dbctx.Vehicles.Where(x => x.Id == idDecrypted);
             if (vehicleExist == null) throw new Exception("Not a valid vehicle");
             var bindUserId = vehicleExist.Select(x => x.userId).FirstOrDefault();
@@ -80,9 +80,9 @@ namespace TMonitBackend.Controllers
         }
 
         [HttpPut("{id}/image")]
-        public async Task<IActionResult> PutEventImage([FromRoute] string id,[FromBody] string encryptedVehicleId)
+        public async Task<IActionResult> PutEventImage([FromRoute] string id, [FromForm] string encryptedVehicleId, [FromForm] IFormFile formFile)
         {
-            var idDecrypted = InlineRSA.Decrypt(encryptedVehicleId);
+            var idDecrypted = InlineCrypto.RSADecrypt(encryptedVehicleId);
             var vehicleExist = _dbctx.Vehicles.Where(x => x.Id == idDecrypted);
             if (vehicleExist == null) throw new Exception("Not a valid vehicle");
             var behaviorRec = await _dbctx.UserBehaviors
@@ -91,7 +91,12 @@ namespace TMonitBackend.Controllers
                 // .Include(x => x.image)
                 .FirstOrDefaultAsync();
             if (behaviorRec == null) return NotFound();
-            byte[] data = await ReadRequestBodyAsBytes();
+            byte[] data;
+            using (var ms = new MemoryStream())
+            {
+                await formFile.CopyToAsync(ms);
+                data = ms.ToArray();
+            }
             var image = new CommonImage()
             {
                 id = Guid.NewGuid().ToString("D"),

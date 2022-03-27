@@ -23,7 +23,7 @@ namespace TMonitBackend.Controllers
         [HttpGet("publicrsa")]
         public async Task<IActionResult> getPublicRSAKey()
         {
-            var publicKey = InlineRSA.ExportPublicKey();
+            var publicKey = InlineCrypto.ExportPublicKey();
             return new JsonResult(new
             {
                 success = true,

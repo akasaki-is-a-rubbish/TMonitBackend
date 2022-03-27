@@ -176,14 +176,19 @@ namespace TMonitBackend.Controllers
         }
 
         [HttpPut("{id}/updateAvatar")]
-        public async Task<IActionResult> UpdateUserAvatar([FromRoute] long id)
+        public async Task<IActionResult> UpdateUserAvatar([FromRoute] long id, [FromForm] IFormFile formFile)
         {
             var userid = long.Parse(User.FindFirstValue("Id") ?? throw new Exception("Not login"));
             var user = await _dbctx.Users.Where(x => x.Id == userid)
                 //todo
                 // .Include(x => x.image)
                 .FirstOrDefaultAsync();
-            byte[] data = await ReadRequestBodyAsBytes();
+            byte[] data;
+            using (var ms = new MemoryStream())
+            {
+                await formFile.CopyToAsync(ms);
+                data = ms.ToArray();
+            }
             var image = new CommonImage()
             {
                 id = Guid.NewGuid().ToString("D"),
@@ -201,9 +206,10 @@ namespace TMonitBackend.Controllers
         }
 
         [HttpPost("{id}/setEmergencyContract")]
-        public async Task<IActionResult> SetEmergencyContract([FromRoute] long id,[FromBody] string emergencyContract){
+        public async Task<IActionResult> SetEmergencyContract([FromRoute] long id, [FromBody] string emergencyContract)
+        {
             var userid = long.Parse(User.FindFirstValue("Id") ?? throw new Exception("Not login"));
-            var user = _dbctx.Users.Where(x=>x.Id == id).FirstOrDefault();
+            var user = _dbctx.Users.Where(x => x.Id == id).FirstOrDefault();
             user.EmergencyContract = emergencyContract;
             await _dbctx.SaveChangesAsync();
             return Ok();
@@ -213,7 +219,7 @@ namespace TMonitBackend.Controllers
         public async Task<IActionResult> GetCurrentUser()
         {
             var userid = long.Parse(User.FindFirstValue("Id") ?? throw new Exception("Not login"));
-            var user = _dbctx.Users.Where(x=>x.Id == userid).FirstOrDefault();
+            var user = _dbctx.Users.Where(x => x.Id == userid).FirstOrDefault();
             var avatarUrl = user.image == null ? "https://github.githubassets.com/images/modules/logos_page/Octocat.png" : "/api/images/" + User.FindFirstValue("imageId");
             return new JsonResult(new
             {
