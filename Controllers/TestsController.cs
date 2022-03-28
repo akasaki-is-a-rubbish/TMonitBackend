@@ -39,7 +39,7 @@ namespace TMonitBackend.Controllers
                 data = decrypted
             });
         }
-        
+
         [HttpPost("vehicle/register")]
         public async Task<IActionResult> RegisterNewVehicle([FromBody] long? forWhichUserId)
         {
@@ -47,7 +47,7 @@ namespace TMonitBackend.Controllers
             _dbctx.Vehicles.Add(new Vehicle
             {
                 Id = newVehicleId,
-                userId = forWhichUserId,
+                userId = forWhichUserId == -1 ? null : forWhichUserId,
                 brand = "Testers",
                 model = "For Tests Only"
             });

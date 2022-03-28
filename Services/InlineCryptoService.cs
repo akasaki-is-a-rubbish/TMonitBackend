@@ -6,7 +6,7 @@ namespace TMonitBackend.Services
 {
     public class InlineCrypto
     {
-        private static UnicodeEncoding _encoder = new UnicodeEncoding();
+        private static UTF8Encoding _encoder = new UTF8Encoding(false);
 
         public InlineCrypto() { }
         protected static RSACryptoServiceProvider RSA = new RSACryptoServiceProvider();

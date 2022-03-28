@@ -21,7 +21,7 @@ namespace TMonitBackend.Models
         
         [HttpPost("qrgenerate")]
         public async Task<IActionResult> GenerateQR([FromBody] string encryptedVehicleId){
-            var idDecrypted = InlineCrypto.RSADecrypt(encryptedVehicleId);
+            var idDecrypted = InlineCrypto.RSADecrypt(encryptedVehicleId).Split('|')[0];
             var vehicleExist = _dbctx.Vehicles.Where(x => x.Id == idDecrypted);
             if (vehicleExist == null) throw new Exception("Not a valid vehicle");
             var payload = idDecrypted + "|" + DateTime.UtcNow.AddMinutes(1).ToString("o");
