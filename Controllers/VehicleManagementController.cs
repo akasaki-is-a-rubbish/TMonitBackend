@@ -18,21 +18,24 @@ namespace TMonitBackend.Models
     {
         DatabaseContext _dbctx;
         public VehicleManagementController(DatabaseContext dbctx) => this._dbctx = dbctx;
-        
+
         [HttpPost("qrgenerate")]
-        public async Task<IActionResult> GenerateQR([FromBody] string encryptedVehicleId){
+        public async Task<IActionResult> GenerateQR([FromBody] string encryptedVehicleId)
+        {
             var idDecrypted = InlineCrypto.RSADecrypt(encryptedVehicleId).Split('|')[0];
             var vehicleExist = _dbctx.Vehicles.Where(x => x.Id == idDecrypted);
             if (vehicleExist == null) throw new Exception("Not a valid vehicle");
             var payload = idDecrypted + "|" + DateTime.UtcNow.AddMinutes(1).ToString("o");
-            return Ok(new {
+            return Ok(new
+            {
                 success = true,
                 qrData = InlineCrypto.RSAEncrypt(payload)
             });
         }
 
         [HttpPost("pair")]
-        public async Task<IActionResult> PairVehicle([FromBody] string qrData){
+        public async Task<IActionResult> PairVehicle([FromBody] string qrData)
+        {
             var userid = long.Parse(User.FindFirstValue("Id") ?? throw new Exception("Not login"));
             var user = _dbctx.Users.Where(x => x.Id == userid).FirstOrDefault();
             var qrDecrypted = InlineCrypto.RSADecrypt(qrData);
@@ -40,11 +43,11 @@ namespace TMonitBackend.Models
             var vehicleId = qrDataParts[0];
             var expireTime = DateTime.Parse(qrDataParts[1]);
 
-            if(expireTime<DateTime.UtcNow) return BadRequest(new {success = false, message = "QR expired"});
+            if (expireTime < DateTime.UtcNow) return BadRequest(new { success = false, message = "QR expired" });
             var vehicleExist = _dbctx.Vehicles.Where(x => x.Id == vehicleId).FirstOrDefault();
             if (vehicleExist == null) throw new Exception("Not a valid vehicle");
             vehicleExist.user = user;
-            if (vehicleExist.userId == userid) return BadRequest(new {success = false, message = "Already paired"});
+            if (vehicleExist.userId == userid) return BadRequest(new { success = false, message = "Already paired" });
             await _dbctx.SaveChangesAsync();
             return Ok();
         }
@@ -59,7 +62,8 @@ namespace TMonitBackend.Models
             return Ok(new
             {
                 Success = true,
-                info = new{
+                info = new
+                {
                     name = vehicleExist.name,
                     model = vehicleExist.model,
                     brand = vehicleExist.brand,
@@ -68,6 +72,26 @@ namespace TMonitBackend.Models
                     userName = user?.UserName,
                     userAvatar = user?.image,
                 }
+            });
+        }
+
+        [HttpGet("list")]
+        public async Task<IActionResult> GetBendVehicles()
+        {
+            var userid = long.Parse(User.FindFirstValue("Id") ?? throw new Exception("Not login"));
+            var user = _dbctx.Users.Where(x => x.Id == userid).FirstOrDefault();
+            var bendVehicles = _dbctx.Vehicles.Where(x => x.userId == userid).AsEnumerable();
+            return new JsonResult(new
+            {
+                vehicles = bendVehicles.Select(x => new VehicleInfo
+                {
+                    Id = x.Id,
+                    name = x.name,
+                    brand = x.brand,
+                    model = x.model,
+                    mileage = x.mileage,
+                    image = x.imageId == null ? null : ("/api/images/" + x.imageId)
+                })
             });
         }
     }

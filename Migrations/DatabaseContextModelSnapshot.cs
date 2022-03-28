@@ -279,6 +279,9 @@ namespace TMonitBackend.Migrations
                     b.Property<string>("brand")
                         .HasColumnType("longtext");
 
+                    b.Property<string>("imageId")
+                        .HasColumnType("varchar(255)");
+
                     b.Property<uint>("mileage")
                         .HasColumnType("int unsigned");
 
@@ -291,17 +294,11 @@ namespace TMonitBackend.Migrations
                     b.Property<long?>("userId")
                         .HasColumnType("bigint");
 
-                    b.Property<string>("vehicleId")
-                        .HasColumnType("longtext");
-
-                    b.Property<string>("vehicleId1")
-                        .HasColumnType("varchar(255)");
-
                     b.HasKey("Id");
 
-                    b.HasIndex("userId");
+                    b.HasIndex("imageId");
 
-                    b.HasIndex("vehicleId1");
+                    b.HasIndex("userId");
 
                     b.ToTable("Vehicles");
                 });
@@ -391,17 +388,17 @@ namespace TMonitBackend.Migrations
 
             modelBuilder.Entity("TMonitBackend.Models.Vehicle", b =>
                 {
+                    b.HasOne("TMonitBackend.Models.CommonImage", "image")
+                        .WithMany()
+                        .HasForeignKey("imageId");
+
                     b.HasOne("TMonitBackend.Models.User", "user")
                         .WithMany("vehicles")
                         .HasForeignKey("userId");
 
-                    b.HasOne("TMonitBackend.Models.Vehicle", "vehicle")
-                        .WithMany()
-                        .HasForeignKey("vehicleId1");
+                    b.Navigation("image");
 
                     b.Navigation("user");
-
-                    b.Navigation("vehicle");
                 });
 
             modelBuilder.Entity("TMonitBackend.Models.User", b =>

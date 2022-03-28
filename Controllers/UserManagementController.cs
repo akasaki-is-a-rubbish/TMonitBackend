@@ -227,7 +227,7 @@ namespace TMonitBackend.Controllers
                 username = User.FindFirstValue(ClaimTypes.Name),
                 email = User.FindFirstValue(ClaimTypes.Email),
                 avatar = avatarUrl,
-                emergencycontract = user.EmergencyContract
+                emergencycontract = user.EmergencyContract,
             });
         }
 
