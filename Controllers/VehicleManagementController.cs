@@ -53,7 +53,7 @@ namespace TMonitBackend.Models
         }
 
         [HttpGet("info")]
-        public async Task<IActionResult> VehicleInformation([FromBody] string? encryptedVehicleId)
+        public async Task<IActionResult> VehicleInformation([FromQuery] string? encryptedVehicleId)
         {
             var idDecrypted = InlineCrypto.RSADecrypt(encryptedVehicleId);
             var vehicleExist = await _dbctx.Vehicles.Where(x => x.Id == idDecrypted).FirstOrDefaultAsync();
