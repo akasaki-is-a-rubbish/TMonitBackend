@@ -163,6 +163,43 @@ namespace TMonitBackend.Migrations
                     b.ToTable("Images");
                 });
 
+            modelBuilder.Entity("TMonitBackend.Models.CourseModel", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("varchar(255)");
+
+                    b.Property<string>("description")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("imageid")
+                        .HasColumnType("varchar(255)");
+
+                    b.Property<string>("name")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("imageid");
+
+                    b.ToTable("Courses");
+                });
+
+            modelBuilder.Entity("TMonitBackend.Models.GroupModel", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("varchar(255)");
+
+                    b.Property<string>("description")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Groups");
+                });
+
             modelBuilder.Entity("TMonitBackend.Models.User", b =>
                 {
                     b.Property<long>("Id")
@@ -175,6 +212,9 @@ namespace TMonitBackend.Migrations
                     b.Property<string>("ConcurrencyStamp")
                         .IsConcurrencyToken()
                         .HasColumnType("longtext");
+
+                    b.Property<string>("CourseModelId")
+                        .HasColumnType("varchar(255)");
 
                     b.Property<string>("Email")
                         .HasMaxLength(256)
@@ -223,6 +263,8 @@ namespace TMonitBackend.Migrations
                         .HasColumnType("varchar(255)");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("CourseModelId");
 
                     b.HasIndex("NormalizedEmail")
                         .HasDatabaseName("EmailIndex");
@@ -354,8 +396,21 @@ namespace TMonitBackend.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("TMonitBackend.Models.CourseModel", b =>
+                {
+                    b.HasOne("TMonitBackend.Models.CommonImage", "image")
+                        .WithMany()
+                        .HasForeignKey("imageid");
+
+                    b.Navigation("image");
+                });
+
             modelBuilder.Entity("TMonitBackend.Models.User", b =>
                 {
+                    b.HasOne("TMonitBackend.Models.CourseModel", null)
+                        .WithMany("partationers")
+                        .HasForeignKey("CourseModelId");
+
                     b.HasOne("TMonitBackend.Models.CommonImage", "image")
                         .WithMany()
                         .HasForeignKey("imageId");
@@ -399,6 +454,11 @@ namespace TMonitBackend.Migrations
                     b.Navigation("image");
 
                     b.Navigation("user");
+                });
+
+            modelBuilder.Entity("TMonitBackend.Models.CourseModel", b =>
+                {
+                    b.Navigation("partationers");
                 });
 
             modelBuilder.Entity("TMonitBackend.Models.User", b =>

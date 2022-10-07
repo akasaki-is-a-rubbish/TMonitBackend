@@ -11,11 +11,14 @@ namespace TMonitBackend.Models
     {
         public DbSet<Vehicle> Vehicles { get; set; }
         public DbSet<UserBehavior> UserBehaviors { get; set; }
-        public DbSet<CommonImage> Images {get; set;}
+        public DbSet<CommonImage> Images { get; set; }
+
+        public DbSet<CourseModel> Courses { get; set; }
+        public DbSet<GroupModel> Groups { get; set; }
 
         public DatabaseContext(DbContextOptions options) : base(options)
         {
-            
+
         }
 
         protected override void OnModelCreating(ModelBuilder builder)

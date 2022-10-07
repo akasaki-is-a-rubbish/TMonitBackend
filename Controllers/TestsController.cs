@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using TMonitBackend.Models;
 using TMonitBackend.Services;
+using TMonitBackend.Models.DTO;
 
 namespace TMonitBackend.Controllers
 {
@@ -55,6 +56,22 @@ namespace TMonitBackend.Controllers
             return Ok(new
             {
                 Id = newVehicleId
+            });
+        }
+        [HttpPost("course/new")]
+        public async Task<IActionResult> CreateNewCourse([FromBody] CourseInfo course)
+        {
+            var newCourseId = Guid.NewGuid().ToString();
+            _dbctx.Courses.Add(new CourseModel
+            {
+                Id = newCourseId,
+                description = course.description,
+                name = course.name
+            });
+            await _dbctx.SaveChangesAsync();
+            return Ok(new
+            {
+                Id = newCourseId
             });
         }
     }
