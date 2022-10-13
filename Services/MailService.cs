@@ -8,7 +8,7 @@ namespace TMonitBackend.Services
     public class EmailService : IMessage
     {
         SmtpClient client;
-        public EmailService(string host, int port, string fromAddr, string displayName) :
+        public EmailService(string host, int port, string fromAddr, string displayName = "TMonitBackend智能汽车服务") :
         this(host, port, new MailAddress(fromAddr, displayName, System.Text.Encoding.UTF8))
         { }
         public EmailService(string host, int port, MailAddress from)
@@ -21,9 +21,10 @@ namespace TMonitBackend.Services
             //todo
             return true;
         }
-        public Task<bool> deliver(User whom, string subject, string content){
+        public Task<bool> deliver(User whom, string subject, string content)
+        {
             //check if user do have an verified email addr
-            if(whom.Email != null || !whom.EmailConfirmed)
+            if (whom.Email != null || !whom.EmailConfirmed)
                 throw new Exception("User has not verified email address");
             return deliver(whom.Email!, subject, content);
         }
